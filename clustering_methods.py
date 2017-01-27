@@ -46,13 +46,33 @@ def agglomerative(data):
     return Z
 
 class knnGraph():
-    def __init__(self, similarity_matrix, k):
-        """
-        knn graph based clustering
-        example:
-        g = knnGraph(similarity_matrix, 20)
-        labels = g.get_labels()
-        """
+    """
+    Knn-graph based clustering using Louvain aglorithm.
+    
+    Dependencies
+    ----------
+    networkx, community, matplotlib
+    
+    Parameters
+    ----------
+    similarity_matrix : 2D array
+    
+    k_nn : int
+        the parameter of the k nearest neighbour for graph generation. Default to 20
+        
+    Examples
+    --------
+    import pickle
+    import numpy as np
+    from clustering_methods import *
+    dissimilarity_matrix = pickle.load(open('outputData/dissimilarityMatrixReplicationMidinote_w_ornament_normalized.pkl','rb'))
+    similarity_matrix = 1 - dissimilarity_matrix
+    g = knnGraph(similarity_matrix)
+    labels = g.get_labels()
+    g.plot()  
+    """
+    
+    def __init__(self, similarity_matrix, k=20):
         self.graph = self.create_knn_graph(similarity_matrix, k)
         self.classes = com.best_partition(self.graph)
         
