@@ -12,6 +12,7 @@ import numpy as np
 import operator
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.metrics.pairwise import euclidean_distances
+import matplotlib.pyplot as plt
 
 
 def kmeans(data, n_clusters=5):
@@ -44,32 +45,41 @@ def agglomerative(data):
     Z = linkage(data, 'Ward')
     return Z
 
-def knnGraph(similarity_matrix, k):
-    """
-    knn graph based clustering
-    example:
-    labels = knnGraph(similarity_matrix, 10)
-    """
-    graph = create_knn_graph(similarity_matrix, k)
-    classes = com.best_partition(graph)
-    return [classes[k] for k in range(len(classes.keys()))]
+class knnGraph():
+    def __init__(self, similarity_matrix, k):
+        """
+        knn graph based clustering
+        example:
+        g = knnGraph(similarity_matrix, 20)
+        labels = g.get_labels()
+        """
+        self.graph = self.create_knn_graph(similarity_matrix, k)
+        self.classes = com.best_partition(self.graph)
+        
+    def get_labels(self):
+        return [self.classes[k] for k in range(len(self.classes.keys()))]
     
-def create_knn_graph(similarity_matrix, k):
-    """ Returns a knn graph from a similarity matrix - NetworkX module """
-    np.fill_diagonal(similarity_matrix, 0) # for removing the 1 from diagonal
-    g = nx.Graph()
-    g.add_nodes_from(range(len(similarity_matrix)))
-    for idx in range(len(similarity_matrix)):
-        g.add_edges_from([(idx, i) for i in nearest_neighbors(similarity_matrix, idx, k)])
-    return g  
+    def plot(self):
+        nx.draw(self.graph)
+        plt.show()
+        
+    def create_knn_graph(self, similarity_matrix, k):
+        """ Returns a knn graph from a similarity matrix - NetworkX module """
+        np.fill_diagonal(similarity_matrix, 0) # for removing the 1 from diagonal
+        g = nx.Graph()
+        g.add_nodes_from(range(len(similarity_matrix)))
+        for idx in range(len(similarity_matrix)):
+            g.add_edges_from([(idx, i) for i in self.nearest_neighbors(similarity_matrix, idx, k)])
+        return g  
     
-def nearest_neighbors(similarity_matrix, idx, k):
-    distances = []
-    for x in range(len(similarity_matrix)):
-        distances.append((x,similarity_matrix[idx][x]))
-    distances.sort(key=operator.itemgetter(1), reverse=True)
-    return [d[0] for d in distances[0:k]]    
- 
+    @staticmethod
+    def nearest_neighbors(similarity_matrix, idx, k):
+        distances = []
+        for x in range(len(similarity_matrix)):
+            distances.append((x,similarity_matrix[idx][x]))
+        distances.sort(key=operator.itemgetter(1), reverse=True)
+        return [d[0] for d in distances[0:k]]    
+
 #X, y = make_blobs(n_samples=10, centers=10, n_features=2, random_state=0)
 #similarity = euclidean_distances(X)
 
