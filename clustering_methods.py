@@ -45,6 +45,11 @@ def agglomerative(data):
     return Z
 
 def knnGraph(similarity_matrix, k):
+    """
+    knn graph based clustering
+    example:
+    labels = knnGraph(similarity_matrix, 10)
+    """
     graph = create_knn_graph(similarity_matrix, k)
     classes = com.best_partition(graph)
     return [classes[k] for k in range(len(classes.keys()))]
