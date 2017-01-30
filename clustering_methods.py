@@ -34,7 +34,7 @@ def meanShift(data):
 
 def spectral(similarity_matrix):
     labels = spectral_clustering(similarity_matrix)
-    return label
+    return labels
 
 def dbscan(data):
     db = DBSCAN(eps=0.3, min_samples=10)

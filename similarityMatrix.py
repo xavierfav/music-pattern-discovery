@@ -14,15 +14,22 @@ def flat_pattern_candidates(dict_pattern_candidates):
     index_pattern_flat = 0
     dict_pattern_index_2_line_index = {}
     pattern_candidates_flat = []
-    for ii in xrange(len(dict_pattern_candidates)):
-        key = str(ii)
-        pattern_candidates = dict_pattern_candidates[key]
-        pattern_candidates_flat += pattern_candidates
 
-        # arrange pattern index to line index mapping
-        for ii in xrange(index_pattern_flat, len(pattern_candidates)+index_pattern_flat):
-            dict_pattern_index_2_line_index[ii] = key
-        index_pattern_flat += len(pattern_candidates)
+    # sort convert keys into int and sort
+    keys_int_sorted = sorted([int(ii) for ii in dict_pattern_candidates.keys()])
+
+    for ii in keys_int_sorted:
+        key = str(ii)
+        try:
+            pattern_candidates = dict_pattern_candidates[key]
+            pattern_candidates_flat += pattern_candidates
+
+            # arrange pattern index to line index mapping
+            for ii in xrange(index_pattern_flat, len(pattern_candidates)+index_pattern_flat):
+                dict_pattern_index_2_line_index[ii] = key
+            index_pattern_flat += len(pattern_candidates)
+        except KeyError:
+            print('Key doesn''t exist '+key)
 
     return pattern_candidates_flat, dict_pattern_index_2_line_index
 
@@ -71,7 +78,7 @@ def runProcess(filepath_pattern_candidates_json,
             dissimilarity_matrix_pairwise_editdistance_normalized[ii_pcf, jj_pcf] \
                 = dissimilarity_matrix_pairwise_editdistance_normalized[jj_pcf, ii_pcf]
 
-    print dissimilarity_matrix_pairwise_editdistance_normalized
+    # print dissimilarity_matrix_pairwise_editdistance_normalized
 
     with open(filepath_pattern_index_2_line_index_json, 'wb') as outfile:
         json.dump(dict_pattern_index_2_line_index, outfile)
@@ -83,7 +90,7 @@ def runProcess(filepath_pattern_candidates_json,
         pickle.dump(dissimilarity_matrix_pairwise_editdistance, outfile)
 
     with open(filepath_dissimlarity_matrix_replication_midinote_normalized_pkl, 'wb') as outfile:
-        pickle.dump(dissimilarity_matrix_pairwise_editdistance, outfile)
+        pickle.dump(dissimilarity_matrix_pairwise_editdistance_normalized, outfile)
 
 if __name__ == '__main__':
 
