@@ -7,7 +7,7 @@ from sklearn.cluster import DBSCAN
 from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn import metrics
 import networkx as nx
-import community.community_louvain as com
+import community as com
 import numpy as np
 import operator
 from sklearn.datasets.samples_generator import make_blobs
@@ -49,14 +49,16 @@ def agglomerative(data):
 class Graph():
     def __init__(self):
         pass
-        
+
     def get_labels(self):
         return [self.classes[k] for k in range(len(self.classes.keys()))]
-    
+
     def plot(self):
-        nx.draw(self.graph)
+        nx.draw_spring(self.graph, cmap=plt.get_cmap('jet'),
+                       node_color=self.get_labels(),
+                       node_size=100, with_labels=False)
         plt.show()
-    
+
     def get_clusters(self):
         id_to_seq = json.load(open('dissimilarityMatrix/index2Pattern_w_ornament.json', 'rb'))
         labels = self.get_labels()
