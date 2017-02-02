@@ -15,13 +15,9 @@ filepath_pattern_candidates_replication_midinote_wo_ornament_json = \
     './sequences/patternsCandidatesReplicationMidinote_wo_ornament.json'
 
 # similarity matrix json
-filepath_dissimlarity_matrix_replication_midinote_w_ornament_pkl = \
-    './dissimilarityMatrix/dissimilarityMatrixReplicationMidinote_w_ornament.pkl'
 filepath_pattern_index_2_line_index_w_ornament_json = './dissimilarityMatrix/patternIndex2LineIndex_w_ornament.json'
 filepath_pattern_index_2_pattern_candidates_w_ornament_json = './dissimilarityMatrix/index2Pattern_w_ornament.json'
 
-filepath_dissimlarity_matrix_replication_midinote_wo_ornament_pkl = \
-    './dissimilarityMatrix/dissimilarityMatrixReplicationMidinote_wo_ornament.pkl'
 filepath_pattern_index_2_line_index_wo_ornament_json = './dissimilarityMatrix/patternIndex2LineIndex_wo_ornament.json'
 filepath_pattern_index_2_pattern_candidates_wo_ornament_json = './dissimilarityMatrix/index2Pattern_wo_ornament.json'
 

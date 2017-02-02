@@ -58,9 +58,20 @@ def pattern_collector_limit_length(sequence, length_pattern, tolerance_length):
         pattern_candidates_ii_start_intolerance = []
         for ii_end in xrange(ii_start+1, len(sequence)):
             pattern_candidate = sequence[ii_start:ii_end+1]
-            if (length_pattern + tolerance_length <= sum_length_pattern(pattern_candidate) <= length_pattern + tolerance_length) \
-                    and pattern_candidate[0][0] != 'rest' \
-                    and pattern_candidate[-1][0] != 'rest':
+
+            # remove rest
+            # print('normal')
+            # print pattern_candidate
+            if pattern_candidate[0][0] == 'rest':
+                # print('with rest ')
+                # print(pattern_candidate)
+                pattern_candidate = pattern_candidate[1:]
+                # print('without rest')
+                # print(pattern_candidate)
+            if pattern_candidate[-1][0] == 'rest':
+                pattern_candidate = pattern_candidate[:-1]
+
+            if length_pattern - tolerance_length <= sum_length_pattern(pattern_candidate) <= length_pattern + tolerance_length:
                 pattern_candidates_ii_start_intolerance.append(tuple(pattern_candidate))
 
         # filter the pattern_candidates_ii_start_intolerance
@@ -76,7 +87,6 @@ def pattern_collector_limit_length(sequence, length_pattern, tolerance_length):
                         pattern_candidate_selected = pcit
             elif len(pattern_candidates_ii_start_intolerance) == 1:
                 pattern_candidate_selected = pattern_candidates_ii_start_intolerance[0]
-
             pattern_candidates.append(pattern_candidate_selected)
 
     return pattern_candidates
@@ -89,12 +99,15 @@ def runProcess(filepath_sequence_pkl, filepath_pattern_candidates_json):
     :param filepath_pattern_candidates_json:
     :return:
     """
+
+    from parameters_global import length_pattern, tolerance_length
+
     sequences = sequence_pkl_reader(filepath_sequence_pkl)
 
     # collect pattern candidates in each line (sequence)
     dict_pattern_candidates = {}
     for ii_sequence, sequence in enumerate(sequences):
-        pattern_candidates = pattern_collector_limit_length(sequence, 16, 2)
+        pattern_candidates = pattern_collector_limit_length(sequence, length_pattern, tolerance_length)
         if len(pattern_candidates):
             dict_pattern_candidates[ii_sequence] = tuple(pattern_candidates)
 

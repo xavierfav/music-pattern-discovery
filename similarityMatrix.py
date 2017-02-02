@@ -7,6 +7,7 @@ import pickle
 import numpy as np
 # from editDistance import levenshtein
 import editdistance
+from dtwSankalp import dtw1d_std
 
 
 def flat_pattern_candidates(dict_pattern_candidates):
@@ -34,11 +35,61 @@ def flat_pattern_candidates(dict_pattern_candidates):
     return pattern_candidates_flat, dict_pattern_index_2_line_index
 
 
+def interp_fix_length(pattern):
+    """
+    interpolation of pattern to fixed length
+    :param pattern:
+    :return:
+    """
+    from parameters_global import length_pattern
+
+    x = np.linspace(0, len(pattern) - 1, len(pattern))
+    xvals = np.linspace(0, len(pattern) - 1, length_pattern)
+    yinterp = np.interp(xvals, x, pattern)
+
+    return yinterp
+
+
+def distance_dtw(pattern0, pattern1):
+    """
+    dtw distance of two patterns
+    :param pattern0:
+    :param pattern1:
+    :return:
+    """
+    pattern0_interp = interp_fix_length(pattern0)
+    pattern1_interp = interp_fix_length(pattern1)
+    dist_dtw, path_align = dtw1d_std(pattern0_interp, pattern1_interp)
+
+    dist_dtw_normalized = dist_dtw/len(path_align[0])
+    return dist_dtw, dist_dtw_normalized
+
+
+def distance_starting_ending_notes(pattern0, pattern1):
+    """
+    distance comparing the starting and the ending notes of two patterns
+    :param pattern0: midinote replication pattern
+    :param pattern1: same as above
+    :return:
+    """
+    if not all([isinstance(note_replication, int) for note_replication in pattern0]):
+        raise TypeError("All element of pattern should be integer.")
+    if not all([isinstance(note_replication, int) for note_replication in pattern1]):
+        raise TypeError("All element of pattern should be integer.")
+
+    # 1.1 avoid 0 dissimilarity
+    distance_pattern0 = 1 - 1.0/(abs(pattern0[0] - pattern1[0]) + 1.1)
+    distance_pattern1 = 1 - 1.0/(abs(pattern0[-1] - pattern1[-1]) + 1.1)
+
+    distance = (distance_pattern0 + distance_pattern1) / 2.0
+
+    return distance
+
+
 def runProcess(filepath_pattern_candidates_json,
                filepath_pattern_candidates_replication_midinote_json,
                filepath_pattern_index_2_line_index_json,
                filepath_index_2_pattern_candidates_json,
-               filepath_dissimlarity_matrix_replication_midinote_pkl,
                filepath_dissimlarity_matrix_replication_midinote_normalized_pkl):
 
     # get similarity matrix index to pattern dictionary
@@ -55,8 +106,9 @@ def runProcess(filepath_pattern_candidates_json,
 
     pattern_candidates_replication_midinote_flat, dict_pattern_index_2_line_index = flat_pattern_candidates(dict_pattern_candidates_replication_midinote)
 
-    dissimilarity_matrix_pairwise_editdistance = np.zeros((len(pattern_candidates_replication_midinote_flat), len(pattern_candidates_replication_midinote_flat)))
     dissimilarity_matrix_pairwise_editdistance_normalized = np.zeros((len(pattern_candidates_replication_midinote_flat), len(pattern_candidates_replication_midinote_flat)))
+    dissimilarity_matrix_pairwise_dtwdistance_normalized = np.zeros((len(pattern_candidates_replication_midinote_flat), len(pattern_candidates_replication_midinote_flat)))
+    dissimilarity_matrix_pairwise_beginning_ending_normalized = np.zeros((len(pattern_candidates_replication_midinote_flat), len(pattern_candidates_replication_midinote_flat)))
 
     for ii_pcf in xrange(len(pattern_candidates_replication_midinote_flat)-1):
         print('calculating the '+str(ii_pcf)+'th pattern')
@@ -65,20 +117,39 @@ def runProcess(filepath_pattern_candidates_json,
             pcf_jj = pattern_candidates_replication_midinote_flat[jj_pcf]
 
             if pcf_ii == pcf_jj:
-                dissimilarity_matrix_pairwise_editdistance[ii_pcf, jj_pcf] = 0
+                dissimilarity_matrix_pairwise_editdistance_normalized[ii_pcf, jj_pcf] = 0
+                dissimilarity_matrix_pairwise_dtwdistance_normalized[ii_pcf, jj_pcf] = 0
+                dissimilarity_matrix_pairwise_beginning_ending_normalized[ii_pcf, jj_pcf] = 0
             else:
-                dissimilarity_matrix_pairwise_editdistance[ii_pcf, jj_pcf] = editdistance.eval(pcf_ii, pcf_jj)
+                # edit distance
                 dissimilarity_matrix_pairwise_editdistance_normalized[ii_pcf, jj_pcf] = \
                     editdistance.eval(pcf_ii, pcf_jj)/float(max(len(pcf_ii), len(pcf_jj)))
 
+                # dtw distance
+                _, dissimilarity_matrix_pairwise_dtwdistance_normalized[ii_pcf, jj_pcf] = \
+                    distance_dtw(pcf_ii, pcf_jj)
+
+                # beginning and ending distance
+                dissimilarity_matrix_pairwise_beginning_ending_normalized[ii_pcf, jj_pcf] = \
+                    distance_starting_ending_notes(pcf_ii, pcf_jj)
+
+    # normalize dissimilarity matrix
+    dissimilarity_matrix_pairwise_dtwdistance_normalized /= np.max(dissimilarity_matrix_pairwise_dtwdistance_normalized)
+    dissimilarity_matrix_pairwise_beginning_ending_normalized /= np.max(dissimilarity_matrix_pairwise_beginning_ending_normalized)
+
+    dissimilarity_matrix_pairwise_fusion = \
+        dissimilarity_matrix_pairwise_editdistance_normalized * \
+        dissimilarity_matrix_pairwise_dtwdistance_normalized * \
+        dissimilarity_matrix_pairwise_beginning_ending_normalized
+
+    # normalize dissimilarity matrix fusion
+    dissimilarity_matrix_pairwise_fusion /= np.max(dissimilarity_matrix_pairwise_fusion)
+
+    # make the symmetry matrix
     for ii_pcf in xrange(1, len(pattern_candidates_replication_midinote_flat)):
         for jj_pcf in xrange(ii_pcf):
-            dissimilarity_matrix_pairwise_editdistance[ii_pcf, jj_pcf] \
-                = dissimilarity_matrix_pairwise_editdistance[jj_pcf, ii_pcf]
-            dissimilarity_matrix_pairwise_editdistance_normalized[ii_pcf, jj_pcf] \
-                = dissimilarity_matrix_pairwise_editdistance_normalized[jj_pcf, ii_pcf]
-
-    # print dissimilarity_matrix_pairwise_editdistance_normalized
+            dissimilarity_matrix_pairwise_fusion[ii_pcf, jj_pcf] \
+                = dissimilarity_matrix_pairwise_fusion[jj_pcf, ii_pcf]
 
     with open(filepath_pattern_index_2_line_index_json, 'wb') as outfile:
         json.dump(dict_pattern_index_2_line_index, outfile)
@@ -86,11 +157,8 @@ def runProcess(filepath_pattern_candidates_json,
     with open(filepath_index_2_pattern_candidates_json, 'wb') as outfile:
         json.dump(dict_index_2_pattern_candidates, outfile)
 
-    with open(filepath_dissimlarity_matrix_replication_midinote_pkl, 'wb') as outfile:
-        pickle.dump(dissimilarity_matrix_pairwise_editdistance, outfile)
-
     with open(filepath_dissimlarity_matrix_replication_midinote_normalized_pkl, 'wb') as outfile:
-        pickle.dump(dissimilarity_matrix_pairwise_editdistance_normalized, outfile)
+        pickle.dump(dissimilarity_matrix_pairwise_fusion, outfile)
 
 if __name__ == '__main__':
 
@@ -99,13 +167,11 @@ if __name__ == '__main__':
                filepath_pattern_candidates_replication_midinote_w_ornament_json,
                filepath_pattern_index_2_line_index_w_ornament_json,
                filepath_pattern_index_2_pattern_candidates_w_ornament_json,
-               filepath_dissimlarity_matrix_replication_midinote_w_ornament_pkl,
                filepath_dissimlarity_matrix_replication_midinote_w_ornament_normalized_pkl)
 
     runProcess(filepath_pattern_candidates_wo_ornament_json,
                filepath_pattern_candidates_replication_midinote_wo_ornament_json,
                filepath_pattern_index_2_line_index_wo_ornament_json,
                filepath_pattern_index_2_pattern_candidates_wo_ornament_json,
-               filepath_dissimlarity_matrix_replication_midinote_wo_ornament_pkl,
                filepath_dissimlarity_matrix_replication_midinote_wo_ornament_normalized_pkl)
 
