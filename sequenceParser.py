@@ -4,7 +4,7 @@ Functions parsing the sequences of Rafa to pattern candidates.
 
 import pickle
 import json
-from parameters_global import length_pattern_minimum
+from parameters_global import length_sequence_minimum
 
 
 def sequence_pkl_reader(filename_sequence_pkl):
@@ -30,7 +30,7 @@ def sum_length_pattern(pattern):
     return sum_len_pattern
 
 
-def pattern_collector_all_possible(sequence):
+def sequence_collector_all_possible(sequence):
     """
     collect all possible pattern candidate if its length >= length_pattern_minimum
     :param sequence: a line, NOT a list of lines
@@ -40,56 +40,58 @@ def pattern_collector_all_possible(sequence):
     for ii_start in xrange(0, len(sequence)-1):
         for ii_end in xrange(ii_start+1, len(sequence)):
             pattern_candidate = sequence[ii_start:ii_end+1]
-            if sum_length_pattern(pattern_candidate) >= length_pattern_minimum:
+            if sum_length_pattern(pattern_candidate) >= length_sequence_minimum:
                 pattern_candidates.append(tuple(pattern_candidate))
     return pattern_candidates
 
 
-def pattern_collector_limit_length(sequence, length_pattern, tolerance_length):
+def sequence_collector_filtered(sequence, length_sequence, tolerance_length, note_number_minimum):
     """
-    collect pattern candidate if its absolute length <= length_pattern + tolerance_length
+    collect sequence candidate if its absolute length <= length_pattern + tolerance_length
     :param sequence: a line, NOT a list of lines
-    :param length_pattern:
+    :param length_sequence:
     :param tolerance_length:
+    :param note_number_minimum: sequence note number <= this number will be filtered out
     :return:
     """
-    pattern_candidates = []
+    sequence_candidates = []
     for ii_start in xrange(0, len(sequence)-1):
-        pattern_candidates_ii_start_intolerance = []
+        sequence_candidates_ii_start_intolerance = []
         for ii_end in xrange(ii_start+1, len(sequence)):
-            pattern_candidate = sequence[ii_start:ii_end+1]
+            sequence_candidate = sequence[ii_start:ii_end+1]
 
-            # remove rest
+            # remove restsequence_collector_limit_length
             # print('normal')
-            # print pattern_candidate
-            if pattern_candidate[0][0] == 'rest':
+            # print sequence_candidate
+            if sequence_candidate[0][0] == 'rest':
                 # print('with rest ')
-                # print(pattern_candidate)
-                pattern_candidate = pattern_candidate[1:]
+                # print(sequence_candidate)
+                sequence_candidate = sequence_candidate[1:]
                 # print('without rest')
-                # print(pattern_candidate)
-            if pattern_candidate[-1][0] == 'rest':
-                pattern_candidate = pattern_candidate[:-1]
+                # print(sequence_candidate)
+            if sequence_candidate[-1][0] == 'rest':
+                sequence_candidate = sequence_candidate[:-1]
 
-            if length_pattern - tolerance_length <= sum_length_pattern(pattern_candidate) <= length_pattern + tolerance_length:
-                pattern_candidates_ii_start_intolerance.append(tuple(pattern_candidate))
+            if (length_sequence - tolerance_length <= sum_length_pattern(sequence_candidate) <= length_sequence + tolerance_length) and \
+                            len(sequence_candidate) > note_number_minimum:
+                sequence_candidates_ii_start_intolerance.append(tuple(sequence_candidate))
 
-        # filter the pattern_candidates_ii_start_intolerance
+        # filter the sequence_candidates_ii_start_intolerance
         # we just want one pattern candidate with the same ii_start
         # find the pattern whose length is nearest to length_pattern
-        min_diff = length_pattern + 2*tolerance_length
-        pattern_candidate_selected = []
-        if len(pattern_candidates_ii_start_intolerance) > 0:
-            if len(pattern_candidates_ii_start_intolerance) > 1:
-                for pcit in pattern_candidates_ii_start_intolerance:
-                    if abs(sum_length_pattern(pcit) - length_pattern) < min_diff:
-                        min_diff = abs(sum_length_pattern(pcit) - length_pattern)
-                        pattern_candidate_selected = pcit
-            elif len(pattern_candidates_ii_start_intolerance) == 1:
-                pattern_candidate_selected = pattern_candidates_ii_start_intolerance[0]
-            pattern_candidates.append(pattern_candidate_selected)
+        min_diff = length_sequence + 2 * tolerance_length
+        sequence_candidate_selected = []
+        if len(sequence_candidates_ii_start_intolerance) > 0:
+            if len(sequence_candidates_ii_start_intolerance) > 1:
+                for pcit in sequence_candidates_ii_start_intolerance:
+                    if abs(sum_length_pattern(pcit) - length_sequence) < min_diff:
+                        min_diff = abs(sum_length_pattern(pcit) - length_sequence)
+                        sequence_candidate_selected = pcit
+            elif len(sequence_candidates_ii_start_intolerance) == 1:
+                sequence_candidate_selected = sequence_candidates_ii_start_intolerance[0]
+            sequence_candidates.append(sequence_candidate_selected)
 
-    return pattern_candidates
+    return sequence_candidates
 
 
 def runProcess(filepath_sequence_pkl, filepath_pattern_candidates_json):
@@ -100,16 +102,18 @@ def runProcess(filepath_sequence_pkl, filepath_pattern_candidates_json):
     :return:
     """
 
-    from parameters_global import length_pattern, tolerance_length
+    from parameters_global import length_sequence, tolerance_length, note_number_minimum
 
     sequences = sequence_pkl_reader(filepath_sequence_pkl)
 
     # collect pattern candidates in each line (sequence)
     dict_pattern_candidates = {}
     for ii_sequence, sequence in enumerate(sequences):
-        pattern_candidates = pattern_collector_limit_length(sequence, length_pattern, tolerance_length)
+        pattern_candidates = sequence_collector_filtered(sequence, length_sequence, tolerance_length, note_number_minimum)
         if len(pattern_candidates):
             dict_pattern_candidates[ii_sequence] = tuple(pattern_candidates)
+
+    # print sum([len(ii) for ii in dict_pattern_candidates.values()])
 
     with open(filepath_pattern_candidates_json, 'wb') as outfile:
         json.dump(dict_pattern_candidates, outfile)

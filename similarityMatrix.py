@@ -41,10 +41,10 @@ def interp_fix_length(pattern):
     :param pattern:
     :return:
     """
-    from parameters_global import length_pattern
+    from parameters_global import length_sequence
 
     x = np.linspace(0, len(pattern) - 1, len(pattern))
-    xvals = np.linspace(0, len(pattern) - 1, length_pattern)
+    xvals = np.linspace(0, len(pattern) - 1, length_sequence)
     yinterp = np.interp(xvals, x, pattern)
 
     return yinterp

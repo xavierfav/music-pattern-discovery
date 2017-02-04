@@ -1,5 +1,6 @@
 # minimum pattern length
-length_pattern_minimum = 16
+length_sequence_minimum = 16
 
-length_pattern = 32
+length_sequence = 32
 tolerance_length = 4
+note_number_minimum = 2
