@@ -68,6 +68,7 @@ def recodeWithOrnaments(filename, subdivision, file2write, graceNoteValue=2.0,
             if n.isRest:
                 name = n.name
                 dur = n.quarterLength*16
+                lyr = False
             else: # If it is a note:
                 # Check if it is a grace note:
                 if n.quarterLength == 0:
@@ -82,6 +83,7 @@ def recodeWithOrnaments(filename, subdivision, file2write, graceNoteValue=2.0,
                     graceNote += graceNoteValue
                     if (notePreGrace == None) and (len(line) > 0):
                         notePreGrace = line.index(line[-1])
+                    lyr = False
                 else:
                 # If it's not a grace note, then
                     # Set name
@@ -114,7 +116,16 @@ def recodeWithOrnaments(filename, subdivision, file2write, graceNoteValue=2.0,
                         if n.tie.type == 'start':
                             dur += n.next().quarterLength*16
                         else: continue
-            line.append([name, dur])
+                    # Set lyric
+                    if n.hasLyrics():
+                        # Check if the lyric is a padding syllable
+                        if '（' in n.lyric:
+                            lyr = False
+                        else:
+                            lyr = n.hasLyrics()
+                    else:
+                        lyr = n.hasLyrics()
+            line.append([name, dur, lyr])
         recodedScore.append(line)
     
     # Check that all durations
@@ -192,6 +203,7 @@ def recodeWithoutOrnaments(filename,subdivision,file2write,noteName='pitch'):
             if n.isRest:
                 name = n.name
                 dur = n.quarterLength*16
+                lyr = False
             else: # If it is a note:
                 # Check if it is a grace note in order to ignore it
                 if n.quarterLength == 0: continue
@@ -209,7 +221,16 @@ def recodeWithoutOrnaments(filename,subdivision,file2write,noteName='pitch'):
                         if n.tie.type == 'start':
                             dur += n.next().quarterLength*16
                         else: continue
-            line.append([name, dur])
+                    # Set lyric
+                    if n.hasLyrics():
+                        # Check if the lyric is a padding syllable
+                        if '（' in n.lyric:
+                            lyr = False
+                        else:
+                            lyr = n.hasLyrics()
+                    else:
+                        lyr = n.hasLyrics()
+            line.append([name, dur, lyr])
         recodedScore.append(line)
     
     # Check that all durations
