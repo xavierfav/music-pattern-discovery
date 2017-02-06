@@ -34,5 +34,3 @@ if __name__ == "__main__":
     from sys import argv
 
     print levenshtein(argv[1], argv[2])
-
-# I hate world and first lines
