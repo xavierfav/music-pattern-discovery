@@ -71,13 +71,13 @@ def runProcess(filepath_pattern_candidates_json,
         pattern_candidates_replication = []
         pattern_candidates_replication_midinote = []
         for pattern_candidate in dict_pattern_candidates[key]:
-            pattern_candidate_replication = replication_representation(pattern_candidate)
+            pattern_candidate_replication = replication_representation(pattern_candidate[:-1])
             pattern_candidates_replication.append(pattern_candidate_replication)
-
             pattern_candidate_replication_midinote = []
             for solmization_note in pattern_candidate_replication:
                 pattern_candidate_replication_midinote.append(solmization_2_midinote(solmization_note))
             pattern_candidates_replication_midinote.append(pattern_candidate_replication_midinote)
+
 
         dict_pattern_candidates_replication[key] = pattern_candidates_replication
         dict_pattern_candidates_replication_midinote[key] = pattern_candidates_replication_midinote

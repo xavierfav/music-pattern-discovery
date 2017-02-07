@@ -1,7 +1,9 @@
 import pickle
 import json
+
 import numpy as np
 from clustering_methods import *
+from cluster_postprocessing import runProcess
 
 
 ind_2_pattern = json.load(open('/home/gong/PycharmProjects/music-pattern-discovery/dissimilarityMatrix/index2Pattern_wo_ornament.json', 'rb'))
@@ -27,15 +29,19 @@ def generate_cluster(g):
 
 k = 0
 g = knnGraph(similarity_matrix, k)
-cluster = generate_cluster(g)
-pickle.dump(cluster, open('clusters/clusters_knn0_wo_ornament_normalized.pkl', 'wb'))
+clusters = generate_cluster(g)
+clusters = runProcess(clusters)
+
+pickle.dump(clusters, open('clusters/clusters_knn0_wo_ornament_normalized.pkl', 'wb'))
 
 k = 5
 g = knnGraph(similarity_matrix, k)
-cluster = generate_cluster(g)
-pickle.dump(cluster, open('clusters/clusters_knn5_wo_ornament_normalized.pkl', 'wb'))
+clusters = generate_cluster(g)
+clusters = runProcess(clusters)
+pickle.dump(clusters, open('clusters/clusters_knn5_wo_ornament_normalized.pkl', 'wb'))
 
 g = weightedGraph(similarity_matrix)
-cluster = generate_cluster(g)
-pickle.dump(cluster, open('clusters/clusters_weighted_wo_ornament_normalized.pkl', 'wb'))
+clusters = generate_cluster(g)
+clusters = runProcess(clusters)
+pickle.dump(clusters, open('clusters/clusters_weighted_wo_ornament_normalized.pkl', 'wb'))
 

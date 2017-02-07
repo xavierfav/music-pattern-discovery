@@ -49,17 +49,37 @@ def interp_fix_length(pattern):
 
     return yinterp
 
-
-def distance_dtw(pattern0, pattern1):
+def sequence_truncate(seq):
     """
-    dtw distance of two patterns
-    :param pattern0:
-    :param pattern1:
+    truncate a sequence to the length_sequence + tolerance_length
+    :param seq:
     :return:
     """
-    pattern0_interp = interp_fix_length(pattern0)
-    pattern1_interp = interp_fix_length(pattern1)
-    dist_dtw, path_align = dtw1d_std(pattern0_interp, pattern1_interp)
+    from parameters_global import length_sequence, tolerance_length
+
+    if len(seq) > length_sequence + tolerance_length:
+        seq_truncated = seq[:length_sequence + tolerance_length]
+    else:
+        seq_truncated = seq
+    return seq_truncated
+
+
+def distance_dtw(seq0, seq1):
+    """
+    dtw distance of two patterns
+    :param seq0:
+    :param seq1:
+    :return:
+    """
+
+    seq0_truncate = sequence_truncate(seq0)
+    seq1_truncate = sequence_truncate(seq1)
+
+    # interpolation of two sequence to the same length, to calculate the dtw normalized
+    seq0_interp = interp_fix_length(seq0_truncate)
+    seq1_interp = interp_fix_length(seq1_truncate)
+
+    dist_dtw, path_align = dtw1d_std(seq0_interp, seq1_interp)
 
     dist_dtw_normalized = dist_dtw/len(path_align[0])
     return dist_dtw, dist_dtw_normalized
@@ -106,7 +126,7 @@ def runProcess(filepath_pattern_candidates_json,
 
     pattern_candidates_replication_midinote_flat, dict_pattern_index_2_line_index = flat_pattern_candidates(dict_pattern_candidates_replication_midinote)
 
-    dissimilarity_matrix_pairwise_editdistance_normalized = np.zeros((len(pattern_candidates_replication_midinote_flat), len(pattern_candidates_replication_midinote_flat)))
+    # dissimilarity_matrix_pairwise_editdistance_normalized = np.zeros((len(pattern_candidates_replication_midinote_flat), len(pattern_candidates_replication_midinote_flat)))
     dissimilarity_matrix_pairwise_dtwdistance_normalized = np.zeros((len(pattern_candidates_replication_midinote_flat), len(pattern_candidates_replication_midinote_flat)))
     dissimilarity_matrix_pairwise_beginning_ending_normalized = np.zeros((len(pattern_candidates_replication_midinote_flat), len(pattern_candidates_replication_midinote_flat)))
 
@@ -117,13 +137,13 @@ def runProcess(filepath_pattern_candidates_json,
             pcf_jj = pattern_candidates_replication_midinote_flat[jj_pcf]
 
             if pcf_ii == pcf_jj:
-                dissimilarity_matrix_pairwise_editdistance_normalized[ii_pcf, jj_pcf] = 0
+                # dissimilarity_matrix_pairwise_editdistance_normalized[ii_pcf, jj_pcf] = 0
                 dissimilarity_matrix_pairwise_dtwdistance_normalized[ii_pcf, jj_pcf] = 0
                 dissimilarity_matrix_pairwise_beginning_ending_normalized[ii_pcf, jj_pcf] = 0
             else:
                 # edit distance
-                dissimilarity_matrix_pairwise_editdistance_normalized[ii_pcf, jj_pcf] = \
-                    editdistance.eval(pcf_ii, pcf_jj)/float(max(len(pcf_ii), len(pcf_jj)))
+                # dissimilarity_matrix_pairwise_editdistance_normalized[ii_pcf, jj_pcf] = \
+                #     editdistance.eval(pcf_ii, pcf_jj)/float(max(len(pcf_ii), len(pcf_jj)))
 
                 # dtw distance
                 _, dissimilarity_matrix_pairwise_dtwdistance_normalized[ii_pcf, jj_pcf] = \
@@ -138,7 +158,6 @@ def runProcess(filepath_pattern_candidates_json,
     dissimilarity_matrix_pairwise_beginning_ending_normalized /= np.max(dissimilarity_matrix_pairwise_beginning_ending_normalized)
 
     dissimilarity_matrix_pairwise_fusion = \
-        dissimilarity_matrix_pairwise_editdistance_normalized * \
         dissimilarity_matrix_pairwise_dtwdistance_normalized * \
         dissimilarity_matrix_pairwise_beginning_ending_normalized
 
