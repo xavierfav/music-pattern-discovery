@@ -60,7 +60,7 @@ def runProcess(filepath_pattern_candidates_json,
     :param filepath_pattern_candidates_replication_midinote_json:
     :return:
     """
-    with open(filepath_pattern_candidates_json, 'rb') as openfile:
+    with open(filepath_pattern_candidates_json, 'r') as openfile:
         dict_pattern_candidates = json.load(openfile)
 
         # shitty part of converting the pattern candidates to replication form
@@ -82,10 +82,10 @@ def runProcess(filepath_pattern_candidates_json,
         dict_pattern_candidates_replication[key] = pattern_candidates_replication
         dict_pattern_candidates_replication_midinote[key] = pattern_candidates_replication_midinote
 
-    with open(filepath_pattern_candidates_replication_json, 'wb') as outfile:
+    with open(filepath_pattern_candidates_replication_json, 'w') as outfile:
         json.dump(dict_pattern_candidates_replication, outfile)
 
-    with open(filepath_pattern_candidates_replication_midinote_json, 'wb') as outfile:
+    with open(filepath_pattern_candidates_replication_midinote_json, 'w') as outfile:
         json.dump(dict_pattern_candidates_replication_midinote, outfile)
 
 

@@ -50,8 +50,8 @@ def sequence_collector_all_possible(sequence):
     :return:
     """
     pattern_candidates = []
-    for ii_start in xrange(0, len(sequence)-1):
-        for ii_end in xrange(ii_start+1, len(sequence)):
+    for ii_start in range(0, len(sequence)-1):
+        for ii_end in range(ii_start+1, len(sequence)):
             pattern_candidate = sequence[ii_start:ii_end+1]
             if sum_length_sequence(pattern_candidate) >= length_sequence_minimum:
                 pattern_candidates.append(tuple(pattern_candidate))
@@ -68,19 +68,30 @@ def sequence_collector_filtered(sequence, ii_sequence, length_sequence, toleranc
     :param note_number_minimum: sequence note number <= this number will be filtered out
     :return:
     """
-    sequence_candidates = []
-    for ii_start in xrange(0, len(sequence)-1):
+    # get the character number
+    num_character = 0
+    for note in sequence:
+        if note[2]:
+            num_character += 1
 
-        # if the starting note of a sequence is not with a lyric, ignore it
-        if not sequence[ii_start][2]:
-            continue
+    jj_character = 0
+    sequence_candidates = []
+    for ii_start in range(0, len(sequence)-1):
 
         # if the starting note of a sequence is a rest, ignore it
         if sequence[ii_start][0] == 'rest':
             continue
 
+        # if the starting note of a sequence is not with a lyric, ignore it
+        # but if jj_character is the last one, do not ignore, because it's tuoqiang
+        if jj_character < num_character:
+            if not sequence[ii_start][2]:
+                continue
+            else:
+                jj_character += 1
+
         sequence_candidates_ii_start_intolerance = []
-        for ii_end in xrange(ii_start+1, len(sequence)):
+        for ii_end in range(ii_start+1, len(sequence)):
             sequence_candidate = sequence[ii_start:ii_end+1]
 
             if sequence_candidate[-1][0] == 'rest':
@@ -139,7 +150,7 @@ def runProcess(filepath_sequence_pkl, filepath_pattern_candidates_json):
 
     # print sum([len(ii) for ii in dict_pattern_candidates.values()])
 
-    with open(filepath_pattern_candidates_json, 'wb') as outfile:
+    with open(filepath_pattern_candidates_json, 'w') as outfile:
         json.dump(dict_pattern_candidates, outfile)
 
 if __name__ == '__main__':

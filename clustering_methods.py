@@ -21,7 +21,7 @@ def kmeans(data, n_clusters=5):
     km.fit(data)
     return km.labels_
 
-
+spectral_clustering
 def affinityPropagation(data, preference=-50):
     af = AffinityPropagation(preference=preference)
     af.fit(data)

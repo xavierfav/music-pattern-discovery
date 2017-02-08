@@ -6,7 +6,7 @@ import json
 import pickle
 import numpy as np
 # from editDistance import levenshtein
-import editdistance
+# import editdistance
 from dtwSankalp import dtw1d_std
 
 
@@ -26,7 +26,7 @@ def flat_pattern_candidates(dict_pattern_candidates):
             pattern_candidates_flat += pattern_candidates
 
             # arrange pattern index to line index mapping
-            for ii in xrange(index_pattern_flat, len(pattern_candidates)+index_pattern_flat):
+            for ii in range(index_pattern_flat, len(pattern_candidates)+index_pattern_flat):
                 dict_pattern_index_2_line_index[ii] = key
             index_pattern_flat += len(pattern_candidates)
         except KeyError:
@@ -113,7 +113,7 @@ def runProcess(filepath_pattern_candidates_json,
                filepath_dissimlarity_matrix_replication_midinote_normalized_pkl):
 
     # get similarity matrix index to pattern dictionary
-    with open(filepath_pattern_candidates_json, 'rb') as openfile:
+    with open(filepath_pattern_candidates_json, 'r') as openfile:
         dict_pattern_candidates = json.load(openfile)
     pattern_candidates_flat, _ = flat_pattern_candidates(dict_pattern_candidates)
 
@@ -121,7 +121,7 @@ def runProcess(filepath_pattern_candidates_json,
     for ii_pc, pattern_candidate in enumerate(pattern_candidates_flat):
         dict_index_2_pattern_candidates[ii_pc] = pattern_candidate
 
-    with open(filepath_pattern_candidates_replication_midinote_json, 'rb') as openfile:
+    with open(filepath_pattern_candidates_replication_midinote_json, 'r') as openfile:
         dict_pattern_candidates_replication_midinote = json.load(openfile)
 
     pattern_candidates_replication_midinote_flat, dict_pattern_index_2_line_index = flat_pattern_candidates(dict_pattern_candidates_replication_midinote)
@@ -130,9 +130,9 @@ def runProcess(filepath_pattern_candidates_json,
     dissimilarity_matrix_pairwise_dtwdistance_normalized = np.zeros((len(pattern_candidates_replication_midinote_flat), len(pattern_candidates_replication_midinote_flat)))
     dissimilarity_matrix_pairwise_beginning_ending_normalized = np.zeros((len(pattern_candidates_replication_midinote_flat), len(pattern_candidates_replication_midinote_flat)))
 
-    for ii_pcf in xrange(len(pattern_candidates_replication_midinote_flat)-1):
+    for ii_pcf in range(len(pattern_candidates_replication_midinote_flat)-1):
         print('calculating the '+str(ii_pcf)+'th pattern')
-        for jj_pcf in xrange(ii_pcf+1, len(pattern_candidates_replication_midinote_flat)):
+        for jj_pcf in range(ii_pcf+1, len(pattern_candidates_replication_midinote_flat)):
             pcf_ii = pattern_candidates_replication_midinote_flat[ii_pcf]
             pcf_jj = pattern_candidates_replication_midinote_flat[jj_pcf]
 
@@ -165,15 +165,15 @@ def runProcess(filepath_pattern_candidates_json,
     dissimilarity_matrix_pairwise_fusion /= np.max(dissimilarity_matrix_pairwise_fusion)
 
     # make the symmetry matrix
-    for ii_pcf in xrange(1, len(pattern_candidates_replication_midinote_flat)):
-        for jj_pcf in xrange(ii_pcf):
+    for ii_pcf in range(1, len(pattern_candidates_replication_midinote_flat)):
+        for jj_pcf in range(ii_pcf):
             dissimilarity_matrix_pairwise_fusion[ii_pcf, jj_pcf] \
                 = dissimilarity_matrix_pairwise_fusion[jj_pcf, ii_pcf]
 
-    with open(filepath_pattern_index_2_line_index_json, 'wb') as outfile:
+    with open(filepath_pattern_index_2_line_index_json, 'w') as outfile:
         json.dump(dict_pattern_index_2_line_index, outfile)
 
-    with open(filepath_index_2_pattern_candidates_json, 'wb') as outfile:
+    with open(filepath_index_2_pattern_candidates_json, 'w') as outfile:
         json.dump(dict_index_2_pattern_candidates, outfile)
 
     with open(filepath_dissimlarity_matrix_replication_midinote_normalized_pkl, 'wb') as outfile:
