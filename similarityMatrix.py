@@ -146,7 +146,7 @@ def runProcess(filepath_pattern_candidates_json,
                 #     editdistance.eval(pcf_ii, pcf_jj)/float(max(len(pcf_ii), len(pcf_jj)))
 
                 # dtw distance
-                _, dissimilarity_matrix_pairwise_dtwdistance_normalized[ii_pcf, jj_pcf] = \
+                _,dissimilarity_matrix_pairwise_dtwdistance_normalized[ii_pcf, jj_pcf] = \
                     distance_dtw(pcf_ii, pcf_jj)
 
                 # beginning and ending distance
@@ -154,7 +154,10 @@ def runProcess(filepath_pattern_candidates_json,
                     distance_starting_ending_notes(pcf_ii, pcf_jj)
 
     # normalize dissimilarity matrix
+    # rescaling by the log, because most of the similarities are small
+    dissimilarity_matrix_pairwise_dtwdistance_normalized = np.log(dissimilarity_matrix_pairwise_dtwdistance_normalized+1)
     dissimilarity_matrix_pairwise_dtwdistance_normalized /= np.max(dissimilarity_matrix_pairwise_dtwdistance_normalized)
+
     dissimilarity_matrix_pairwise_beginning_ending_normalized /= np.max(dissimilarity_matrix_pairwise_beginning_ending_normalized)
 
     dissimilarity_matrix_pairwise_fusion = \
@@ -162,7 +165,9 @@ def runProcess(filepath_pattern_candidates_json,
         dissimilarity_matrix_pairwise_beginning_ending_normalized
 
     # normalize dissimilarity matrix fusion
-    dissimilarity_matrix_pairwise_fusion /= np.max(dissimilarity_matrix_pairwise_fusion)
+    # dissimilarity_matrix_pairwise_fusion
+
+    # print(dissimilarity_matrix_pairwise_fusion)
 
     # make the symmetry matrix
     for ii_pcf in range(1, len(pattern_candidates_replication_midinote_flat)):

@@ -31,7 +31,7 @@ colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']
 if len(patterns) > len(colors):
     print('There are', len(patterns) - len(colors), 'more patterns than colors')
 
-for c in [2]:#range(len(patterns)):
+for c in [1]:#range(len(patterns)):
     # Patterns to search: p2s
     col = 'red'
     patterns2search = patterns[c]

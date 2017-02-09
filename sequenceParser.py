@@ -148,7 +148,7 @@ def runProcess(filepath_sequence_pkl, filepath_pattern_candidates_json):
             # print pattern_candidates
             dict_pattern_candidates[ii_sequence] = tuple(pattern_candidates)
 
-    # print sum([len(ii) for ii in dict_pattern_candidates.values()])
+    print(sum([len(ii) for ii in dict_pattern_candidates.values()]))
 
     with open(filepath_pattern_candidates_json, 'w') as outfile:
         json.dump(dict_pattern_candidates, outfile)
