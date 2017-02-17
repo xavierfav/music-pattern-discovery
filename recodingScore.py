@@ -19,15 +19,15 @@ import pickle
 
 def recodeWithOrnaments(filename, subdivision, file2write, graceNoteValue=2.0,
                         noteName='pitch'):
-    '''str, [int], str --> [[(str, float)]] in a pickle file
+    '''str, [int], str --> [[[str, float, bol]]] in a pickle file
     It takes the filename of a aligned score in xml, as produced with the
     jingjuScores.py script, a list with the number of the last measure of the
     first and second line subvidision in the score, the name of the pickle file
     to be created and the duration value for each grace note. For each line,
-    the notes are converted into tuples with the name of the note, and its
-    duration in duration units (64th notes), grouped into a list for each line,
-    all lines grouped in a list which is dumped into a pickle file. It returns
-    this list.
+    the notes are converted into lists with the name of the note, its duration
+    in duration units (64th notes) and True or False if the note has lyrics,
+    grouped into a list for each line, all lines grouped in a list which is
+    dumped into a pickle file. It returns this list.
     If noteName = 'pitch', the name of the note is its pitch class plus octave
     (e.g. 'E4'), if noteName = 'midi', the name is its midi value (e.g. 64).
     '''
@@ -159,15 +159,15 @@ def recodeWithOrnaments(filename, subdivision, file2write, graceNoteValue=2.0,
     return recodedScore
         
 def recodeWithoutOrnaments(filename,subdivision,file2write,noteName='pitch'):
-    '''str, [int], str --> [[(str, float)]] in a pickle file
+    '''str, [int], str --> [[[str, float, bol]]] in a pickle file
     It takes the filename of a aligned score in xml, as produced with the
     jingjuScores.py script, a list with the number of the last measure of the
     first and second line subvidision in the score, and the name of the pickle
-    file to be created. For each line, the notes are converted into tuples with
-    the name of the note, and its duration in duration units (64th notes),
-    grouped into a list for each line, all lines grouped in a list which is
-    dumped into a pickle file. It returns this list. Grace notes are not
-    considered.
+    file to be created. For each line, the notes are converted into lists with
+    the name of the note, its duration in duration units (64th notes) and True
+    or False if the note has lyrics, grouped into a list for each line, all
+    lines grouped in a list which is dumped into a pickle file. It returns this
+    list. Grace notes are not considered.
     If noteName = 'pitch', the name of the note is its pitch class plus octave
     (e.g. 'E4'), if noteName = 'midi', the name is its midi value (e.g. 64).
     '''
