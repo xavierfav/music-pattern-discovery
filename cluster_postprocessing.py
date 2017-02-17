@@ -22,10 +22,11 @@ def cluster_cleaner(cluster):
     # find the max length sequence for each index
     for index in indices:
         length_max = -1
-        for seq in [sequence[:-1] for sequence in cluster if sequence[-1] == index]:
+        for seq_full in [sequence for sequence in cluster if sequence[-1] == index]:
+            seq = seq_full[:-1]
             len_seq = sum_length_sequence(seq, length_sequence + tolerance_length, truncate=False)
             if len_seq > length_max:
-                seq_max_length = seq
+                seq_max_length = seq_full
                 length_max = len_seq
         cluster_cleaned.append(seq_max_length)
     return cluster_cleaned

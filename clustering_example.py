@@ -7,10 +7,11 @@ import sequenceParser
 import patternRepresentation
 import similarityMatrix
 import cluster_postprocessing
+import similarityMatrixFiltering
 
 from file_path_global import *
 
-"""
+
 sequenceParser.runProcess(filepath_sequence_pkl_w_ornament, filepath_pattern_candidates_w_ornament_json)
 sequenceParser.runProcess(filepath_sequence_pkl_wo_ornament, filepath_pattern_candidates_wo_ornament_json)
 
@@ -33,7 +34,12 @@ similarityMatrix.runProcess(filepath_pattern_candidates_wo_ornament_json,
            filepath_pattern_index_2_line_index_wo_ornament_json,
            filepath_pattern_index_2_pattern_candidates_wo_ornament_json,
            filepath_dissimlarity_matrix_replication_midinote_wo_ornament_normalized_pkl)
-"""
+
+similarityMatrixFiltering.runProcess(filepath_dissimlarity_matrix_replication_midinote_w_ornament_normalized_pkl,
+                                     filepath_pattern_index_2_pattern_candidates_w_ornament_json)
+
+similarityMatrixFiltering.runProcess(filepath_dissimlarity_matrix_replication_midinote_wo_ornament_normalized_pkl,
+                                     filepath_pattern_index_2_pattern_candidates_wo_ornament_json)
 
 ind_2_pattern = json.load(open('/home/gong/PycharmProjects/music-pattern-discovery/dissimilarityMatrix/index2Pattern_wo_ornament.json', 'r'))
 dissimilarity_matrix = pickle.load(open('dissimilarityMatrix/dissimilarityMatrixReplicationMidinote_wo_ornament_normalized.pkl','rb'))

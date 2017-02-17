@@ -58,7 +58,12 @@ def sequence_collector_all_possible(sequence):
     return pattern_candidates
 
 
-def sequence_collector_filtered(sequence, ii_sequence, length_sequence, tolerance_length, note_number_minimum):
+def sequence_collector_filtered(sequence,
+                                ii_sequence,
+                                length_sequence,
+                                tolerance_length,
+                                note_number_minimum,
+                                sequence_filtering=True):
     """
     collect sequence candidate if its absolute length <= length_pattern + tolerance_length
     :param sequence: a line, NOT a list of lines
@@ -66,6 +71,7 @@ def sequence_collector_filtered(sequence, ii_sequence, length_sequence, toleranc
     :param ii_sequence: sequence index
     :param tolerance_length:
     :param note_number_minimum: sequence note number <= this number will be filtered out
+    :param sequence_filtering: True only keep one sequence for each ii_start
     :return:
     """
     # get the character number
@@ -101,29 +107,41 @@ def sequence_collector_filtered(sequence, ii_sequence, length_sequence, toleranc
             # sequence note number should be greater than note_number_minimum
             # add [ii_sequence, ii_start] identifier to the end of each sequence
             if len(sequence_candidate) > note_number_minimum:
-                # print sequence_candidate, sum_length_sequence(sequence_candidate, length_sequence+tolerance_length, truncate=True)
+                # print(sequence_candidate, [ii_sequence, ii_start], sum_length_sequence(sequence_candidate, length_sequence+tolerance_length, truncate=True))
                 if length_sequence - tolerance_length <= sum_length_sequence(sequence_candidate, length_sequence+tolerance_length, truncate=True) <= length_sequence + tolerance_length:
                     sequence_candidates_ii_start_intolerance.append(tuple(sequence_candidate+[[ii_sequence, ii_start]]))
 
-        """
-        # filter the sequence_candidates_ii_start_intolerance
-        # we just want one pattern candidate with the same ii_start
-        # find the pattern whose length is nearest to length_pattern
-        min_diff = length_sequence + 2 * tolerance_length
-        sequence_candidate_selected = []
-        if len(sequence_candidates_ii_start_intolerance) > 0:
-            if len(sequence_candidates_ii_start_intolerance) > 1:
-                for pcit in sequence_candidates_ii_start_intolerance:
-                    if abs(sum_length_sequence(pcit, length_sequence+tolerance_length, truncate=True) - length_sequence) < min_diff:
-                        min_diff = abs(sum_length_sequence(pcit, length_sequence+tolerance_length, truncate=True) - length_sequence)
-                        sequence_candidate_selected = pcit
-            elif len(sequence_candidates_ii_start_intolerance) == 1:
-                sequence_candidate_selected = sequence_candidates_ii_start_intolerance[0]
-            sequence_candidates.append(sequence_candidate_selected)
-        """
+        if sequence_filtering:
+            # filter the sequence_candidates_ii_start_intolerance
+            # we just want one pattern candidate with the same ii_start
+            # find the pattern whose length is nearest to length_pattern
+            min_diff = length_sequence + 2 * tolerance_length
+            sequence_candidate_selected = []
+            if len(sequence_candidates_ii_start_intolerance) > 0:
+                if len(sequence_candidates_ii_start_intolerance) > 1:
+                    for pcit in sequence_candidates_ii_start_intolerance:
+                        # not consider the last element
+                        sum_length_pcit = sum_length_sequence(pcit[:-1], length_sequence + tolerance_length,
+                                                   truncate=True)
+                        diff = abs(sum_length_pcit - length_sequence)
 
-        for seq_candidate in sequence_candidates_ii_start_intolerance:
-            sequence_candidates.append(seq_candidate)
+                        if diff <= min_diff:
+                            min_diff = abs(diff - length_sequence)
+                            if diff == min_diff:
+                                # difference equals to minimum difference, if it's longer, we keep it, unless we keep previous one
+                                # prefer long sequence
+                                if sum_length_pcit > sum_length_sequence(sequence_candidate_selected, length_sequence + tolerance_length, truncate=True):
+                                    sequence_candidate_selected = pcit
+                            else:
+                                sequence_candidate_selected = pcit
+                elif len(sequence_candidates_ii_start_intolerance) == 1:
+                    sequence_candidate_selected = sequence_candidates_ii_start_intolerance[0]
+                # print(sequence_candidate_selected, sum_length_sequence(sequence_candidate_selected[:-1], 40, True))
+                sequence_candidates.append(sequence_candidate_selected)
+        else:
+            for seq_candidate in sequence_candidates_ii_start_intolerance:
+                # print(seq_candidate, sum_length_sequence(seq_candidate[:-1], 40, True))
+                sequence_candidates.append(seq_candidate)
 
     return sequence_candidates
 
@@ -143,12 +161,17 @@ def runProcess(filepath_sequence_pkl, filepath_pattern_candidates_json):
     # collect pattern candidates in each line (sequence)
     dict_pattern_candidates = {}
     for ii_sequence, sequence in enumerate(sequences):
-        pattern_candidates = sequence_collector_filtered(sequence, ii_sequence, length_sequence, tolerance_length, note_number_minimum)
+        pattern_candidates = sequence_collector_filtered(sequence,
+                                                         ii_sequence,
+                                                         length_sequence,
+                                                         tolerance_length,
+                                                         note_number_minimum,
+                                                         sequence_filtering=True)
         if len(pattern_candidates):
             # print pattern_candidates
             dict_pattern_candidates[ii_sequence] = tuple(pattern_candidates)
 
-    print(sum([len(ii) for ii in dict_pattern_candidates.values()]))
+    # print(sum([len(ii) for ii in dict_pattern_candidates.values()]))
 
     with open(filepath_pattern_candidates_json, 'w') as outfile:
         json.dump(dict_pattern_candidates, outfile)
@@ -157,5 +180,7 @@ if __name__ == '__main__':
 
     from file_path_global import *
 
+    # a = (['G#4', 8.0, True], ['F#4', 4.0, False], ['G#4', 4.0, False], ['A4', 24.0, True], [2, 1])
+    # sum_length_sequence(a, 40, True)
     runProcess(filepath_sequence_pkl_w_ornament, filepath_pattern_candidates_w_ornament_json)
     runProcess(filepath_sequence_pkl_wo_ornament, filepath_pattern_candidates_wo_ornament_json)

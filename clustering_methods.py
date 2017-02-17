@@ -100,7 +100,7 @@ class weightedGraph(Graph):
             # print(similarity_matrix[idx])
             g.add_weighted_edges_from(
                 [(idx, i[0], i[1]) for i in zip(range(len(similarity_matrix)), similarity_matrix[idx]) if
-                 i[0] != idx and i[1] != 0 and i[1] > 0.6])
+                 i[0] != idx and i[1] != 0])
         return g
 
 
@@ -141,7 +141,7 @@ class knnGraph(Graph):
         g = nx.Graph()
         g.add_nodes_from(range(len(similarity_matrix)))
         for idx in range(len(similarity_matrix)):
-            g.add_edges_from([(idx, i) for i in self.k_nearest_neighbors(similarity_matrix, idx, k) if similarity_matrix[idx, k] > 0.6])
+            g.add_edges_from([(idx, i) for i in self.k_nearest_neighbors(similarity_matrix, idx, k)])
         return g
 
     @staticmethod

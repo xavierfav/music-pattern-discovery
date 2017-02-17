@@ -170,10 +170,10 @@ def runProcess(filepath_pattern_candidates_json,
     # print(dissimilarity_matrix_pairwise_fusion)
 
     # make the symmetry matrix
-    for ii_pcf in range(1, len(pattern_candidates_replication_midinote_flat)):
-        for jj_pcf in range(ii_pcf):
-            dissimilarity_matrix_pairwise_fusion[ii_pcf, jj_pcf] \
-                = dissimilarity_matrix_pairwise_fusion[jj_pcf, ii_pcf]
+    # for ii_pcf in range(1, len(pattern_candidates_replication_midinote_flat)):
+    #     for jj_pcf in range(ii_pcf):
+    #         dissimilarity_matrix_pairwise_fusion[ii_pcf, jj_pcf] \
+    #             = dissimilarity_matrix_pairwise_fusion[jj_pcf, ii_pcf]
 
     with open(filepath_pattern_index_2_line_index_json, 'w') as outfile:
         json.dump(dict_pattern_index_2_line_index, outfile)
