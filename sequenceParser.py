@@ -96,6 +96,9 @@ def sequence_collector_filtered(sequence,
             else:
                 jj_character += 1
 
+        if not sequence[ii_start][2]:
+            print(sequence)
+
         sequence_candidates_ii_start_intolerance = []
         for ii_end in range(ii_start+1, len(sequence)):
             sequence_candidate = sequence[ii_start:ii_end+1]

@@ -46,8 +46,8 @@ def getListMatrix(dict_index_2_pattern_candidates,
             # examine if two sequences are overlapping, firstly, they should be at the same sentence
             # pcf_ii[-1][0] is the sentence number
             if pcf_ii[-1][0] == pcf_jj[-1][0]:
-                end_pcf_ii = pcf_ii[-1][1] + sum_length_sequence(pcf_ii[:-1], length_sequence+tolerance_length, truncate=False)
-                end_pcf_jj = pcf_jj[-1][1] + sum_length_sequence(pcf_jj[:-1], length_sequence+tolerance_length, truncate=False)
+                end_pcf_ii = pcf_ii[-1][1] + len(pcf_ii[:-1]) - 1
+                end_pcf_jj = pcf_jj[-1][1] + len(pcf_jj[:-1]) - 1
                 # print(pcf_ii[-1][1], end_pcf_ii, pcf_ii[-1][0], pcf_jj[-1][1], end_pcf_jj, pcf_jj[-1][0])
 
                 if not overlapping([pcf_ii[-1][1],end_pcf_ii],[pcf_jj[-1][1],end_pcf_jj]):
@@ -67,13 +67,18 @@ def mergeSequences(seq0, seq1):
     :param seq1:
     :return:
     """
-    if seq1[-1][1] < seq0[-1][0]:
+    if seq1[-1][1] < seq0[-1][1]:
         # swith to make sure seq1 comes after seq0
         temp_seq = seq0[:]
         seq0     = seq1
         seq1     = temp_seq
 
     merged = seq0[:seq1[-1][1]-seq0[-1][1]] + seq1[:-1] + seq0[-1:]
+
+    # merged_first = [note[0] for note in merged[:-1]]
+    # for ii in merged_first:
+    #     if isinstance(ii, int):
+    #         print(merged)
     return merged
 
 def mergeSequencePairBatch(listMatrix, dict_index_2_pattern_candidates):
@@ -101,10 +106,10 @@ def mergeSequencePairBatch(listMatrix, dict_index_2_pattern_candidates):
 
         if len(list({seq_0_0[-1][0], seq_1_0[-1][0], seq_0_1[-1][0], seq_1_1[-1][0]})) <= 2:
             # the case if the phrase space fo all four sequences are <= 2
-            end_seq_0_0 = seq_0_0[-1][1] + sum_length_sequence(seq_0_0[:-1],length_sequence+tolerance_length,truncate=False)
-            end_seq_1_0 = seq_1_0[-1][1] + sum_length_sequence(seq_1_0[:-1],length_sequence+tolerance_length,truncate=False)
-            end_seq_0_1 = seq_0_1[-1][1] + sum_length_sequence(seq_0_1[:-1],length_sequence+tolerance_length,truncate=False)
-            end_seq_1_1 = seq_1_1[-1][1] + sum_length_sequence(seq_1_1[:-1],length_sequence+tolerance_length,truncate=False)
+            end_seq_0_0 = seq_0_0[-1][1] + len(seq_0_0[:-1]) - 1
+            end_seq_1_0 = seq_1_0[-1][1] + len(seq_1_0[:-1]) - 1
+            end_seq_0_1 = seq_0_1[-1][1] + len(seq_0_1[:-1]) - 1
+            end_seq_1_1 = seq_1_1[-1][1] + len(seq_1_1[:-1]) - 1
 
             # if seq_0_0 == [['F#4', 8.0, False], ['F#4', 8.0, False], ['G#4', 16.0, False], [32, 8]] or \
             #     seq_0_1 == [['F#4', 8.0, False], ['F#4', 8.0, False], ['G#4', 16.0, False], [32, 8]] or \
@@ -170,7 +175,7 @@ def runProcess(filepath_dissimilarity_matrix_pkl,
 
     listMatrix = getListMatrix(dict_index_2_pattern_candidates,
                                dissimilarity_matrix_pairwise_fusion,
-                               K=100)
+                               K=50)
 
     listMatrix, dict_index_2_pattern_candidates = mergeSequencePairBatch(listMatrix, dict_index_2_pattern_candidates)
 
@@ -216,7 +221,7 @@ def runProcess(filepath_dissimilarity_matrix_pkl,
     dict_index_2_pattern_candidates_new_midinote = {}
     for key in dict_new_index:
         dict_index_2_pattern_candidates_new[dict_new_index[key]] = dict_index_2_pattern_candidates[str(key)]
-        # print(dict_index_2_pattern_candidates[str(key)][:-1])
+        print(dict_index_2_pattern_candidates[str(key)][:-1])
         # for rr in replication_representation(dict_index_2_pattern_candidates[str(key)][:-1]):
             # print(rr)
             # print(solmization_2_midinote(rr))

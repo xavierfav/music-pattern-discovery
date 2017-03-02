@@ -12,6 +12,8 @@ import numpy as np
 import operator
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.metrics.pairwise import euclidean_distances
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import json
 
@@ -21,7 +23,7 @@ def kmeans(data, n_clusters=5):
     km.fit(data)
     return km.labels_
 
-spectral_clustering
+# spectral_clustering
 def affinityPropagation(data, preference=-50):
     af = AffinityPropagation(preference=preference)
     af.fit(data)

@@ -41,9 +41,9 @@ similarityMatrixFiltering.runProcess(filepath_dissimlarity_matrix_replication_mi
 similarityMatrixFiltering.runProcess(filepath_dissimlarity_matrix_replication_midinote_wo_ornament_normalized_pkl,
                                      filepath_pattern_index_2_pattern_candidates_wo_ornament_json)
 
-ind_2_pattern = json.load(open('/home/gong/PycharmProjects/music-pattern-discovery/dissimilarityMatrix/index2Pattern_wo_ornament.json', 'r'))
-dissimilarity_matrix = pickle.load(open('dissimilarityMatrix/dissimilarityMatrixReplicationMidinote_wo_ornament_normalized.pkl','rb'))
-similarity_matrix = 1 - dissimilarity_matrix
+ind_2_pattern           = json.load(open('./dissimilarityMatrix/index2Pattern_wo_ornament.json', 'r'))
+dissimilarity_matrix    = pickle.load(open('./dissimilarityMatrix/dissimilarityMatrixReplicationMidinote_wo_ornament_normalized.pkl','rb'))
+similarity_matrix       = 1 - dissimilarity_matrix
 
 # for k in range(0, 21):
 #     g = knnGraph(similarity_matrix, k)

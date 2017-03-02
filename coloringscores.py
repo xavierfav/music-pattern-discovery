@@ -21,7 +21,7 @@ with open(inPkl, 'rb') as f:
 with open(outPkl, 'rb') as f:
     clusters = pickle.load(f)
 
-toDisplay = [0]#range(len(clusters))
+toDisplay = [5]#range(len(clusters))
 
 print('Loaded clusters:')
 totalSequences = 0
@@ -54,7 +54,7 @@ for i in toDisplay:
         adjustment = 0
         while scoreNotes[adjustment].isRest:
             adjustment += 1
-        """
+
         # Start from the index given in the outpost sequence
         adjustment += position[1]
 
@@ -83,7 +83,7 @@ for i in toDisplay:
                         
         if withOrnaments:
             raise Exception('No code for withOrnaments yet')
-        """
+
     s.show()
 
 ####################################

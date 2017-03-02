@@ -3,7 +3,7 @@ import sys,os
 
 # the project folder: fileDir
 fileDir = os.path.dirname(os.path.realpath('__file__'))
-dtwPath = os.path.join(fileDir, '../dtw/')
+dtwPath = os.path.join(fileDir, './dtw/')
 # transcribe the path string to full path
 dtwPath = os.path.abspath(os.path.realpath(dtwPath))
 
