@@ -8,9 +8,9 @@ Created on Wed Feb  1 10:20:53 2017
 from music21 import *
 import pickle
 
-inPkl = '../pitchWithOut.pkl'
-outPkl = '../clusters_knn5_wo_ornament_normalized.pkl'
-original = '../Pat-lsxpybs1.xml'
+inPkl = './sequences/pitchWithOut.pkl'
+outPkl = './clusters/clusters_knn5_wo_ornament_normalized.pkl'
+original = './scoreXML/Pat-lsxpybs1.xml'
 subdivision = [2, 7]
 withOrnaments = False
 colors = ['red', 'violet', 'blue']
@@ -21,7 +21,7 @@ with open(inPkl, 'rb') as f:
 with open(outPkl, 'rb') as f:
     clusters = pickle.load(f)
 
-toDisplay = range(len(clusters))
+toDisplay = [0]#range(len(clusters))
 
 print('Loaded clusters:')
 totalSequences = 0
@@ -39,13 +39,14 @@ for i in toDisplay:
     sectionLimits = [0]
     sectionLimits.extend(subdivision)
     sectionLimits.append(len(s.parts[0].getElementsByClass('Measure')))
+    # print(clusters[i])
     for sequence in clusters[i]:
         position = sequence[-1]
         partNum = int(position[0]/3)
         dou = position[0]%3
         seqNotes = sequence[:-1]
+        print(seqNotes)
         print(partNum, dou, position, len(seqNotes))
-        
         p = s.parts[partNum]
         section = p.measures(sectionLimits[dou]+1, sectionLimits[dou+1])
         scoreNotes = list(section.recurse().notesAndRests)
@@ -53,10 +54,10 @@ for i in toDisplay:
         adjustment = 0
         while scoreNotes[adjustment].isRest:
             adjustment += 1
-
+        """
         # Start from the index given in the outpost sequence
         adjustment += position[1]
-        
+
         if not withOrnaments:
             toRemove = []
             for j in range(len(scoreNotes)):
@@ -82,6 +83,7 @@ for i in toDisplay:
                         
         if withOrnaments:
             raise Exception('No code for withOrnaments yet')
+        """
     s.show()
 
 ####################################

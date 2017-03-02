@@ -24,16 +24,16 @@ patternRepresentation.runProcess(filepath_pattern_candidates_wo_ornament_json,
            filepath_pattern_candidates_replication_midinote_wo_ornament_json)
 
 similarityMatrix.runProcess(filepath_pattern_candidates_w_ornament_json,
-           filepath_pattern_candidates_replication_midinote_w_ornament_json,
-           filepath_pattern_index_2_line_index_w_ornament_json,
-           filepath_pattern_index_2_pattern_candidates_w_ornament_json,
-           filepath_dissimlarity_matrix_replication_midinote_w_ornament_normalized_pkl)
+                           filepath_pattern_candidates_replication_midinote_w_ornament_json,
+                           filepath_pattern_index_2_line_index_w_ornament_json,
+                           filepath_pattern_index_2_pattern_candidates_w_ornament_json,
+                           filepath_dissimlarity_matrix_replication_midinote_w_ornament_normalized_pkl)
 
 similarityMatrix.runProcess(filepath_pattern_candidates_wo_ornament_json,
-           filepath_pattern_candidates_replication_midinote_wo_ornament_json,
-           filepath_pattern_index_2_line_index_wo_ornament_json,
-           filepath_pattern_index_2_pattern_candidates_wo_ornament_json,
-           filepath_dissimlarity_matrix_replication_midinote_wo_ornament_normalized_pkl)
+                           filepath_pattern_candidates_replication_midinote_wo_ornament_json,
+                           filepath_pattern_index_2_line_index_wo_ornament_json,
+                           filepath_pattern_index_2_pattern_candidates_wo_ornament_json,
+                           filepath_dissimlarity_matrix_replication_midinote_wo_ornament_normalized_pkl)
 
 similarityMatrixFiltering.runProcess(filepath_dissimlarity_matrix_replication_midinote_w_ornament_normalized_pkl,
                                      filepath_pattern_index_2_pattern_candidates_w_ornament_json)
@@ -62,12 +62,12 @@ def generate_cluster(g):
     return cluster
 
 
-k = 0
-g = knnGraph(similarity_matrix, k)
-clusters = generate_cluster(g)
-clusters = cluster_postprocessing.runProcess(clusters)
-
-pickle.dump(clusters, open('clusters/clusters_knn0_wo_ornament_normalized.pkl', 'wb'))
+# k = 0
+# g = knnGraph(similarity_matrix, k)
+# clusters = generate_cluster(g)
+# clusters = cluster_postprocessing.runProcess(clusters)
+#
+# pickle.dump(clusters, open('clusters/clusters_knn0_wo_ornament_normalized.pkl', 'wb'))
 
 k = 5
 g = knnGraph(similarity_matrix, k)

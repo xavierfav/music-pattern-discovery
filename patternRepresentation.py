@@ -18,6 +18,7 @@ def solmization_2_midinote(solmization):
     midinote = 0
     i = 0
     # Note
+    # print(solmization)
     letter = solmization[:-1].upper()
     for note in Notes:
         if letter in note:
@@ -73,6 +74,7 @@ def runProcess(filepath_pattern_candidates_json,
         for pattern_candidate in dict_pattern_candidates[key]:
             pattern_candidate_replication = replication_representation(pattern_candidate[:-1])
             pattern_candidates_replication.append(pattern_candidate_replication)
+
             pattern_candidate_replication_midinote = []
             for solmization_note in pattern_candidate_replication:
                 pattern_candidate_replication_midinote.append(solmization_2_midinote(solmization_note))
